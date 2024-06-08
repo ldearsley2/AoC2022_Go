@@ -69,4 +69,52 @@ func main() {
 	}
 
 	fmt.Println(total)
+	fmt.Println(part2("day3/input.txt", letterPriority))
+}
+
+func part2(filepath string, letterPriority map[string]int) int {
+	file, err := os.Open(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+
+	total := 0
+	groupCount := 0
+	groupArr := [3]string{}
+
+	for scanner.Scan() {
+		if groupCount == 3 {
+			for _, c := range groupArr[0] {
+				if strings.Contains(groupArr[1], string(c)) && strings.Contains(groupArr[2], string(c)) {
+					fmt.Printf("%c found in both groups\n", c)
+					if unicode.IsUpper(c) {
+						total += 26 + letterPriority[strings.ToLower(string(c))]
+						break
+					}
+					total += letterPriority[strings.ToLower(string(c))]
+					break
+				}
+			}
+			groupCount = 0
+			groupArr = [3]string{}
+		}
+		groupArr[groupCount] = scanner.Text()
+		groupCount++
+	}
+
+	for _, c := range groupArr[0] {
+		if strings.Contains(groupArr[1], string(c)) && strings.Contains(groupArr[2], string(c)) {
+			fmt.Printf("%c found in both groups\n", c)
+			if unicode.IsUpper(c) {
+				total += 26 + letterPriority[strings.ToLower(string(c))]
+				break
+			}
+			total += letterPriority[strings.ToLower(string(c))]
+			break
+		}
+	}
+
+	return total
 }
